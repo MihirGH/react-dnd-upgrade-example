@@ -54,16 +54,23 @@ function makeDroppable(
 
   class DropWrapper extends DropZoneComponent {
     render() {
+      console.log("inside dropabble's render")
       const renderWrapper = this.props.dropTarget || ((component) => component)
       //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
+      console.log("rendering dropabble's super")
       return React.cloneElement(super.render(), {
-        ref: _partial(refConstructor, this, renderWrapper, options.refProp),
+        ref: _partial(
+          refConstructor,
+          'withDroppable',
+          this,
+          renderWrapper,
+          options.refProp
+        ),
       })
     }
   }
 
-  DropWrapper.displayName =
-    DropZoneComponent.displayName || `${dndIds} DropZone`
+  DropWrapper.displayName = `${dndIds} DropZone`
 
   return dropTarget(dndIds, DROP_LIFECYCLE_METHODS, DROP_COLLECTOR)(DropWrapper)
 }

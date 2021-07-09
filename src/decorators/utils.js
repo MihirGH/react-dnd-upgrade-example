@@ -11,7 +11,8 @@ import _isFunction from 'lodash/isFunction'
  * @param  {object} instance React component that is being initialized
  * @return {*}               React component to render
  */
-export function refConstructor(context, wrapper, refProp, instance) {
+export function refConstructor(place, context, wrapper, refProp, instance) {
+  console.log('place', place)
   if (refProp) {
     if (_isFunction(context[refProp])) {
       context[refProp](instance)

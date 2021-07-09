@@ -36,15 +36,23 @@ function makeDraggable(
     }
 
     render() {
+      console.log("inside draggable's render")
       const renderWrapper = this.props.dragSource || ((component) => component)
+      console.log("rendering draggable's super")
       //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
       return React.cloneElement(super.render(), {
-        ref: _partial(refConstructor, this, renderWrapper, options.refProp),
+        ref: _partial(
+          refConstructor,
+          'withDraggable',
+          this,
+          renderWrapper,
+          options.refProp
+        ),
       })
     }
   }
 
-  DragWrapper.displayName = ComponentToDrag.displayName || `${dndId} Drag`
+  DragWrapper.displayName = `${dndId} Drag`
 
   return dragSource(dndId, dragCallbackHooks, DRAG_COLLECTOR)(DragWrapper)
 }
