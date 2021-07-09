@@ -1,4 +1,6 @@
-import React from 'react'
+// Libraries
+import React, { useCallback } from 'react'
+import ReactDOM from 'react-dom'
 import { DropTarget as dropTarget } from 'react-dnd'
 
 import _isArray from 'lodash/isArray'
@@ -6,8 +8,6 @@ import _isFunction from 'lodash/isFunction'
 import _omit from 'lodash/omit'
 import _defaults from 'lodash/defaults'
 import _partial from 'lodash/partial'
-
-import { refConstructor } from './utils'
 
 /**
  * Wrap any ReactComponent to accept drop and its Container component should be wrapped into dndContext which is internally use by React-Dnd.
@@ -52,23 +52,25 @@ function makeDroppable(
     )
   }
 
-  class DropWrapper extends DropZoneComponent {
-    render() {
-      console.log("inside dropabble's render")
-      const renderWrapper = this.props.dropTarget || ((component) => component)
-      //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
-      console.log("rendering dropabble's super")
-      return React.cloneElement(super.render(), {
-        ref: _partial(
-          refConstructor,
-          'withDroppable',
-          this,
-          renderWrapper,
-          options.refProp
-        ),
-      })
-    }
-  }
+  const DropWrapper = React.forwardRef((props, forwardedRef) => {
+    const { dropTarget: connectDropTarget } = props
+
+    const registerRef = useCallback((elementOrInstance) => {
+      if (typeof connectDropTarget === 'function') {
+        connectDropTarget(ReactDOM.findDOMNode(elementOrInstance))
+      }
+      if (!forwardedRef) return
+
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(elementOrInstance)
+      } else {
+        forwardedRef.current = elementOrInstance
+      }
+    }, [])
+
+    //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
+    return <DropZoneComponent {...props} ref={registerRef} />
+  })
 
   DropWrapper.displayName = `${dndIds} DropZone`
 

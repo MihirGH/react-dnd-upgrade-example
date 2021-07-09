@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+// Libraries
+import React, { useCallback, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 import { DragSource as dragSource } from 'react-dnd'
 import { getEmptyImage } from 'react-dnd-html5-backend'
 
 import _partial from 'lodash/partial'
-
-import { refConstructor } from './utils'
 
 /**
  * Wrap any ReactComponent to accept drop and its Container component should be wrapped into dndContext which is internally use by React-Dnd.
@@ -24,33 +24,35 @@ function makeDraggable(
 ) {
   const DRAG_COLLECTOR = options.dragCollector
 
-  class DragWrapper extends ComponentToDrag {
-    componentDidMount() {
-      const { props } = this
-      if (props.dragPreview && !!options.customDragPreview) {
-        props.dragPreview(getEmptyImage(), { captureDraggingState: true })
-      }
-      if (super.componentDidMount) {
-        super.componentDidMount()
-      }
-    }
+  const DragWrapper = React.forwardRef((props, forwardedRef) => {
+    const { dragPreview, dragSource: connectDragSource } = props
 
-    render() {
-      console.log("inside draggable's render")
-      const renderWrapper = this.props.dragSource || ((component) => component)
-      console.log("rendering draggable's super")
-      //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
-      return React.cloneElement(super.render(), {
-        ref: _partial(
-          refConstructor,
-          'withDraggable',
-          this,
-          renderWrapper,
-          options.refProp
-        ),
-      })
-    }
-  }
+    useEffect(() => {
+      if (dragPreview && !!options.customDragPreview) {
+        dragPreview(getEmptyImage(), { captureDraggingState: true })
+      }
+    }, [dragPreview])
+
+    const registerRef = useCallback(
+      (elementOrInstance) => {
+        if (typeof connectDragSource === 'function') {
+          connectDragSource(ReactDOM.findDOMNode(elementOrInstance))
+        }
+
+        if (!forwardedRef) return
+
+        if (typeof forwardedRef === 'function') {
+          forwardedRef(elementOrInstance)
+        } else {
+          forwardedRef.current = elementOrInstance
+        }
+      },
+      [connectDragSource]
+    )
+
+    //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
+    return <ComponentToDrag {...props} ref={registerRef} />
+  })
 
   DragWrapper.displayName = `${dndId} Drag`
 

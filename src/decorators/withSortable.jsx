@@ -27,7 +27,7 @@ export default function (Component, itemType) {
       return {
         hover: (props, monitor) => {
           const sourceIndex = monitor.getItem().index
-          const targetIndex = this.props.index
+          const targetIndex = props.index
 
           if (sourceIndex === targetIndex) return
 
