@@ -24,14 +24,11 @@ function makeDraggable(
 ) {
   const DRAG_COLLECTOR = options.dragCollector
 
-  class DragWrapper extends ComponentToDrag {
+  class DragWrapper extends Component {
     componentDidMount() {
       const { props } = this
       if (props.dragPreview && !!options.customDragPreview) {
         props.dragPreview(getEmptyImage(), { captureDraggingState: true })
-      }
-      if (super.componentDidMount) {
-        super.componentDidMount()
       }
     }
 
@@ -40,7 +37,7 @@ function makeDraggable(
       const renderWrapper = this.props.dragSource || ((component) => component)
       console.log("rendering draggable's super")
       //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
-      return React.cloneElement(super.render(), {
+      return React.cloneElement(<ComponentToDrag {...this.props} />, {
         ref: _partial(
           refConstructor,
           'withDraggable',

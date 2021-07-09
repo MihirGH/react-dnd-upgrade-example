@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { DropTarget as dropTarget } from 'react-dnd'
 
 import _isArray from 'lodash/isArray'
@@ -52,13 +52,13 @@ function makeDroppable(
     )
   }
 
-  class DropWrapper extends DropZoneComponent {
+  class DropWrapper extends Component {
     render() {
       console.log("inside dropabble's render")
       const renderWrapper = this.props.dropTarget || ((component) => component)
       //Need to do this as react-dnd does not allow to use React custom elements, only native ones are allowed
       console.log("rendering dropabble's super")
-      return React.cloneElement(super.render(), {
+      return React.cloneElement(<DropZoneComponent {...this.props} />, {
         ref: _partial(
           refConstructor,
           'withDroppable',
