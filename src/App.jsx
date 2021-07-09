@@ -1,7 +1,7 @@
 // Libraries
 import React from 'react'
-import { DragDropContext as dragDropContext } from 'react-dnd'
-import HTML5 from 'react-dnd-html5-backend'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 // Components
 import CardsList from './components/CardContainer'
@@ -9,7 +9,12 @@ import CardsList from './components/CardContainer'
 // Styles
 import './App.css'
 
-const connectDndBackend = dragDropContext(HTML5)
+const connectDndBackend = (Component) => (props) =>
+  (
+    <DndProvider backend={HTML5Backend}>
+      <Component {...props} />
+    </DndProvider>
+  )
 
 function App() {
   return <CardsList />
